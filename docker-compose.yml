@@ -1,18 +1,18 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: nannyconnect_db
+    container_name: refugia_db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-nannyuser}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nannypassword}
-      POSTGRES_DB: ${POSTGRES_DB:-nannyconnect}
+      POSTGRES_USER: ${POSTGRES_USER:-refugiauser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-refugiapassword}
+      POSTGRES_DB: ${POSTGRES_DB:-refugia}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nannyuser}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-refugiauser}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -21,13 +21,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: nannyconnect_app
+    container_name: refugia_app
     restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-nannyuser}:${POSTGRES_PASSWORD:-nannypassword}@postgres:5432/${POSTGRES_DB:-nannyconnect}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-refugiauser}:${POSTGRES_PASSWORD:-refugiapassword}@postgres:5432/${POSTGRES_DB:-refugia}
     env_file:
       - .env
     ports:
@@ -35,7 +35,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: nannyconnect_nginx
+    container_name: refugia_nginx
     restart: unless-stopped
     depends_on:
       - app

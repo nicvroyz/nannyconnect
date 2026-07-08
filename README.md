@@ -93,13 +93,13 @@ Resolución de dominios de negocio complejos en funcionalidades técnicas:
 ### Entorno de Producción (VPS)
 Configuración optimizada para Docker:
 ```bash
-git clone https://github.com/nicvroyz/nannyconnect.git
-cd nannyconnect
+git clone https://github.com/nicvroyz/refugia.git
+cd refugia
 cp .env.example .env
 # Levantar infraestructura (App + DB + NGINX)
 docker-compose up -d --build
 # Migraciones
-docker exec -it nannyconnect_app npx prisma migrate deploy
+docker exec -it refugia_app npx prisma migrate deploy
 ```
 
 ### Entorno de Desarrollo
