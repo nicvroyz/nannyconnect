@@ -1,32 +1,72 @@
-# 🏠 Refugia (NannyConnect)
+<div align="center">
+  <h1>🏠 Refugia</h1>
+  <p><strong>Conectamos familias con niñeras de confianza.</strong></p>
+  <p>Una plataforma moderna, segura y orientada a la tranquilidad del hogar.</p>
+</div>
 
-Refugia (internamente "NannyConnect") es una plataforma web moderna que conecta a familias con niñeras de confianza. Permite la búsqueda, reserva y pago de servicios de cuidado infantil, con perfiles verificados y un sistema de reseñas.
+---
 
-## 🚀 Tecnologías
+## 📖 Sobre Refugia
 
-* **Frontend & Backend**: Next.js 16 (App Router) + React + Turbopack
-* **Base de Datos**: PostgreSQL
-* **ORM**: Prisma
-* **Autenticación**: NextAuth.js (Credenciales/JWT)
-* **Estilos**: Tailwind CSS + Componentes UI personalizados
-* **Pagos**: Integración con Flow.cl (Webpay)
-* **Emails**: Resend API
-* **Despliegue**: Docker & Docker Compose (listo para VPS)
+**Refugia** es una plataforma web integral diseñada para resolver la necesidad de encontrar cuidado infantil seguro y confiable. Permite a las familias descubrir niñeras cercanas, revisar sus certificaciones, reservar horarios específicos y realizar pagos de forma completamente digital y automatizada.
 
-## ✨ Características Principales
+El sistema cuenta con tres portales principales diseñados para ofrecer una experiencia fluida a cada tipo de usuario:
+- 👨‍👩‍👧 **Panel de Familias**
+- 👩‍🍼 **Panel de Niñeras**
+- 🛡️ **Panel de Administración**
 
-* **🏢 Panel de Familias**: Buscar niñeras por comuna, ver perfiles detallados, enviar solicitudes de reserva, gestionar favoritos y pagar servicios a través de Flow.
-* **👩‍🍼 Panel de Niñeras**: Gestionar calendario de disponibilidad, aceptar/rechazar solicitudes de cuidado, ver historial de trabajos y configurar tarifas.
-* **🛡️ Panel de Administración**: Aprobar nuevos perfiles de niñeras, gestionar usuarios, monitorear todas las reservas y ver métricas globales.
-* **🔔 Sistema de Notificaciones**: Notificaciones por correo electrónico transaccional (Resend) para nuevas solicitudes, confirmaciones y recordatorios.
-* **🔒 Seguridad**: Protección de rutas por roles (Admin, Nanny, Family), contraseñas hasheadas con bcrypt (rounds: 12), y variables de entorno protegidas.
+---
 
-## ⚙️ Requisitos Previos
+## 🎨 Diseño y UI/UX
 
-* Node.js 18+ o superior
-* Docker y Docker Compose (para despliegue en producción)
-* Una cuenta en [Flow.cl](https://www.flow.cl/) para procesar pagos (sandbox o prod)
-* Una cuenta en [Resend](https://resend.com/) para el envío de correos
+Refugia fue diseñada bajo los principios de **Modernidad, Confianza y Calidez**, lo cual se refleja en su interfaz de usuario.
+
+### Estética y Colores (Design System)
+- **Brand (Warm Lavender / Violet)**: El color primario de la marca (`#7c3aed`). Transmite profesionalismo pero con un toque moderno y acogedor. Utilizado en botones primarios, enlaces y acentos visuales.
+- **Fondos (Warm Cream)**: En lugar de blancos puros y grises fríos, la app utiliza fondos color crema (`#fffbf5`) que hacen que la interfaz se sienta mucho más cálida y humana.
+- **Trust Green**: Un verde esmeralda (`#059669`) utilizado exclusivamente para elementos de confianza como insignias de "Verificada", checkmarks y confirmaciones de pago.
+- **Gradientes Suaves**: La aplicación hace uso extensivo de `gradient-warm` y `gradient-hero` para crear profundidad sin abrumar la vista.
+
+### Experiencia Interactiva
+- **Micro-animaciones**: Transiciones suaves en toda la plataforma (`fade-in`, `slide-up` y elementos `float` en el hero) para que la app se sienta viva y responsiva.
+- **Glassmorphism**: Efectos de desenfoque (`backdrop-blur`) en tarjetas superpuestas y modales, lo que entrega un look premium y de última generación.
+- **Tipografía**: Basada en `Inter` para máxima legibilidad, combinando pesos `font-black` para precios y `font-medium` para la lectura diaria.
+
+---
+
+## 🚀 Tecnologías (Tech Stack)
+
+La aplicación está construida sobre un stack moderno y escalable:
+
+### Frontend
+- **Framework**: Next.js 16 (App Router)
+- **Librería de UI**: React
+- **Estilos**: Tailwind CSS (con Design System personalizado)
+- **Componentes**: Construidos desde cero (sin depender de pesadas librerías de componentes) para mantener el HTML semántico y un CSS mínimo y rápido.
+
+### Backend & Datos
+- **Base de Datos**: PostgreSQL
+- **ORM**: Prisma (para type-safety y migraciones declarativas)
+- **Autenticación**: NextAuth.js v4 (Estrategia JWT y Credenciales con contraseñas hasheadas en `bcrypt` de 12 rondas)
+
+### Integraciones Externas
+- **Pasarela de Pagos**: [Flow.cl](https://www.flow.cl/) (Webpay Plus, Servipag, Mach, etc.) a través de webhooks seguros.
+- **Emailing**: [Resend API](https://resend.com/) para el envío de notificaciones y recibos con plantillas HTML nativas.
+
+### Infraestructura
+- **Docker**: El repositorio incluye `Dockerfile` y `docker-compose.yml` listos para ser desplegados en cualquier VPS (junto con NGINX para reverse proxy).
+
+---
+
+## ⚙️ Características Principales
+
+* 🔍 **Algoritmo de Matching**: Ordena a las niñeras basándose en distancia (cálculo radial), habilidades, disponibilidad de calendario y bonificaciones de confianza.
+* 💬 **Chat Integrado**: Sistema de mensajería contextual ligada a una reserva, permitiendo que la familia y la niñera conversen solo cuando la reserva ha sido pre-aprobada.
+* 📅 **Disponibilidad Semanal**: Las niñeras pueden editar su grilla de horarios disponibles, y el sistema automáticamente bloquea cruces de reservas.
+* 💳 **Pagos Seguros**: Al confirmar un servicio, la familia es redirigida a la pasarela y el sistema espera el Webhook de Flow para marcar la reserva como pagada.
+* 🔒 **Seguridad de Rutas (Middleware)**: Protección robusta en el borde (Edge) mediante `next-auth/middleware` que asegura que una familia no pueda entrar al dashboard de admin o de niñera y viceversa.
+
+---
 
 ## 🛠️ Instalación y Configuración Local
 
@@ -42,48 +82,39 @@ Refugia (internamente "NannyConnect") es una plataforma web moderna que conecta 
    ```
 
 3. **Configurar Variables de Entorno**
-   Copia el archivo de ejemplo y completa las variables:
    ```bash
    cp .env.example .env
    ```
-   Asegúrate de llenar las variables de base de datos, `NEXTAUTH_SECRET`, y tus APIs de Flow y Resend.
+   Edita el `.env` con tus credenciales de PostgreSQL, Flow y Resend.
 
-4. **Configurar la Base de Datos**
-   Asegúrate de tener un servidor PostgreSQL corriendo en el puerto 5432 (puedes usar el `docker-compose.yml` para levantar solo la BD si lo deseas).
+4. **Sincronizar la Base de Datos**
    ```bash
-   # Generar el cliente Prisma
    npx prisma generate
-   
-   # Empujar el esquema a la base de datos
    npx prisma db push
    ```
 
-5. **Iniciar el servidor de desarrollo**
+5. **Correr el servidor**
    ```bash
    npm run dev
    ```
-   La app estará disponible en `http://localhost:3000`.
 
-## 📦 Despliegue a Producción (VPS con Docker)
+## 📦 Despliegue (VPS / Producción)
 
-El proyecto incluye un entorno Docker completo con la aplicación, PostgreSQL y NGINX configurados.
+Refugia está diseñada para correr de manera contenida.
 
-1. En tu servidor VPS, clona el repositorio y configura el `.env` con tus claves reales de producción y el dominio de tu sitio.
-2. Ejecuta Docker Compose:
-   ```bash
-   docker-compose up -d --build
-   ```
-3. Aplica las migraciones de base de datos dentro del contenedor:
-   ```bash
-   docker exec -it nannyconnect_app npx prisma migrate deploy
-   ```
+```bash
+# Dentro del servidor VPS
+git clone https://github.com/nicvroyz/nannyconnect.git
+cd nannyconnect
+cp .env.example .env # (No olvides configurarlo)
 
-## 🧹 Tareas Programadas (Cron)
+# Levantar infraestructura
+docker-compose up -d --build
 
-Para limpiar los pagos que quedaron estancados (expirados) sin ser pagados en Flow, puedes configurar un Cron Job (ej. Vercel Cron o crontab en linux) que llame al endpoint:
-`GET /api/cron/cleanup-payments`
-Pasando el header `Authorization: Bearer <TU_CRON_SECRET>`.
+# Aplicar base de datos
+docker exec -it nannyconnect_app npx prisma migrate deploy
+```
 
 ## 📄 Licencia
 
-Este proyecto es de uso privado.
+Propiedad intelectual privada. Todos los derechos reservados.
