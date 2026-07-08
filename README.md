@@ -1,111 +1,111 @@
 <div align="center">
   <h1>🏠 Refugia</h1>
-  <p><strong>Plataforma integral de conexión entre familias y cuidadoras infantiles.</strong></p>
+  <p><strong>Plataforma B2C de conexión entre familias y cuidadoras infantiles.</strong></p>
 </div>
 
 ---
 
-## 📖 Contexto del Proyecto
+## 🏗️ Arquitectura
 
-**Refugia** (internamente NannyConnect) es un SaaS B2C diseñado para resolver el problema de encontrar cuidado infantil de manera segura, rápida y trazable. La plataforma digitaliza el proceso completo de contratación: desde la búsqueda basada en geolocalización y validación de antecedentes, hasta la calendarización, el chat contextual y la pasarela de pago transaccional.
+**Refugia** (internamente NannyConnect) digitaliza el proceso de contratación de servicios de cuidado infantil. La plataforma gestiona el ciclo completo: búsqueda basada en geolocalización, validación de antecedentes, calendarización cruzada, mensajería condicional y pasarela de pago transaccional.
+
+### Características Técnicas
+
+* **Framework**: Next.js 16 (App Router) con renderizado híbrido (Server Components & Client Components).
+* **Data Fetching**: Mutaciones mediante Server Actions para evitar endpoints API intermediarios.
+* **Base de Datos**: PostgreSQL para manejo concurrente de transacciones y consistencia referencial.
+* **ORM**: Prisma (Type-safe ORM).
+* **Autenticación**: JWT mediante `NextAuth.js`. Contraseñas hasheadas (Bcrypt, 12 rounds).
+* **Control de Acceso (RBAC)**: Evaluación de JWT en el borde (Edge) mediante `next-auth/middleware`.
+
+### Métricas de Ingeniería
+* **> 15 Entidades Prisma** modelando el dominio del negocio.
+* **RBAC para 3 dominios** aislados (`FAMILY`, `NANNY`, `ADMIN`).
+* **> 30 Server Actions** encapsulando la lógica de negocio.
+* **Sistema transaccional completo** con manejo de fallos y soft-deletes.
+* **Integración con 3 APIs externas** de manera asíncrona.
 
 ---
 
-## 🏗️ Arquitectura y Stack Tecnológico
+## 📈 Escalabilidad
 
-Refugia está construida sobre un stack moderno y escalable enfocado en el rendimiento y la seguridad del lado del servidor.
+La arquitectura del sistema está diseñada para soportar crecimiento y concurrencia bajo las siguientes características:
 
-### Core Stack
-* **Next.js 16 (App Router)**: Renderizado híbrido con Server Components para SEO y tiempos de carga óptimos.
-* **Server Actions**: Mutaciones de datos directamente desde componentes sin necesidad de endpoints API REST tradicionales.
-* **Prisma ORM**: Modelado de datos declarativo y Type-Safety extremo entre la base de datos y la aplicación.
-* **PostgreSQL**: Base de datos relacional robusta (migrada desde SQLite para soporte de concurrencia en producción).
-* **JWT Authentication**: Sistema sin estado manejado por `NextAuth.js` con contraseñas hasheadas (Bcrypt, 12 rondas).
-* **Middleware Authorization**: Protección de rutas en el borde (Edge) evaluando JWTs para interceptar accesos no autorizados antes de renderizar la página.
-* **Docker & NGINX**: Contenedorización completa con reverse proxy para orquestación y despliegue rápido.
-* **Role Based Access Control (RBAC)**: Segregación estricta de dominios de usuario (`FAMILY`, `NANNY`, `ADMIN`).
+* **Stateless Authentication**: Uso exclusivo de JWT, eliminando la necesidad de almacenamiento de sesiones en memoria y facilitando el escalamiento horizontal.
+* **Horizontal Scaling**: Contenedores aislados en Docker que permiten orquestación y balanceo de carga.
+* **Reverse Proxy**: NGINX pre-configurado para manejar el tráfico, compresión GZIP y terminación SSL.
+* **Asynchronous Processing**: Webhooks para pagos y notificaciones, previniendo el bloqueo del event loop principal.
+* **Multi-domain Ready**: Estructura de base de datos preparada para expansión regional mediante segregación de locaciones geográficas.
 
 ---
 
-## 📊 Diagramas de Flujo
+## 🧩 Integraciones
 
-### Flujo de Datos y Arquitectura Base
+* **Flow.cl**: Webpay y métodos locales a través de webhooks seguros.
+* **Resend API**: Envío de emails transaccionales HTML.
+* **NextAuth**: Gestión de sesiones e identidad.
+* **Prisma**: Capa de abstracción de datos.
+* **PostgreSQL**: Motor relacional primario.
+
+---
+
+## 📊 Diagramas de Sistema
+
+### Flujo de Datos
 ```mermaid
 graph TD
-    A[Cliente / Navegador] -->|HTTP Request| B(Next.js App Router)
-    B -->|Server Actions| C{Prisma ORM}
-    C -->|Query SQL| D[(PostgreSQL)]
+    A[Cliente] -->|HTTP Request| B(Next.js Server Components)
+    B -->|Server Actions| C{Prisma}
+    C -->|SQL| D[(PostgreSQL)]
     D -->|Data| C
     C -->|Type-Safe Object| B
-    B -->|Server Component HTML| A
+    B -->|HTML Renderizado| A
 ```
 
-### Ciclo de Vida de Reservas y Pagos
+### Ciclo de Vida de Reservas
 ```mermaid
 graph TD
-    A[Usuario Familia] -->|Solicita| B(Creación de Reserva)
-    B -->|Espera Confirmación| C[Niñera Acepta]
-    C -->|Redirección Segura| D(Pasarela Flow.cl)
-    D -.->|Notificación Asíncrona| E(Webhook API)
-    E -->|Validación criptográfica| F{Verificar Firma Flow}
-    F -->|Éxito| G[Reserva Confirmada]
+    A[Usuario Familia] -->|Solicita| B(Reserva)
+    B -->|Espera Validación| C[Aprobación Niñera]
+    C -->|Redirección| D(Flow Gateway)
+    D -.->|Webhook Asíncrono| E(API Endpoint)
+    E -->|Verificación criptográfica| F{Firma Válida}
+    F -->|Sí| G[Reserva Confirmada]
 ```
 
 ---
 
-## 🎯 Problemas de Ingeniería Resueltos
+## 🎯 Engineering Challenges
 
-La plataforma maneja lógicas complejas encapsuladas en un sistema coherente:
+Resolución de dominios de negocio complejos en funcionalidades técnicas:
 
-* **✓ Matching Geográfico**: Algoritmo de cálculo radial basado en coordenadas anonimizadas para encontrar perfiles dentro del área de cobertura de la niñera.
-* **✓ Autenticación e Identidad**: Flujo de registro separado según rol, validando unicidad de emails y hasheo seguro.
-* **✓ Roles (RBAC)**: `middleware.ts` en la raíz del proyecto evita accesos cruzados de sesión sin cargar código innecesario.
-* **✓ Sistema de Pagos Seguro**: Integración asíncrona mediante webhooks. Soporte para fallas temporales y limpiezas programadas (cron jobs) de pagos estancados.
-* **✓ Chat Contextual**: Creación condicional de salas de mensajería (conversations) vinculadas a un ID de reserva, protegiendo la privacidad al permitir chat solo en estados confirmados.
-* **✓ Motor de Disponibilidad**: Sistema de intersección de fechas para prevenir "Double Booking" validando horarios de trabajo registrados vs bloques bloqueados manualmente o reservas previas.
-* **✓ Contenedorización con Docker**: Orquestación aislada en `docker-compose.yml`, eliminando dependencias locales para la base de datos y unificando las variables de entorno.
-* **✓ Transacciones por Emails**: Notificaciones HTML asíncronas vía API (Resend) para eventos clave del ciclo de vida del usuario sin bloquear el renderizado del request HTTP principal.
+* **Matching Geográfico**: Cálculo radial basado en coordenadas (anonimizadas en frontend por seguridad) para determinar la cobertura efectiva entre proveedor y cliente.
+* **Double Booking Prevention**: Motor de disponibilidad que intersecta bloques bloqueados manualmente, horarios fijos de trabajo y reservas pre-existentes para evitar colisiones temporales.
+* **Webhooks Transaccionales**: Integración asíncrona de pagos con sistema de fallbacks y un *cron job* implementado para limpiar reservas estancadas en estados pendientes de pago.
+* **Role Based Access Control (RBAC)**: Middleware perimetral que intercepta requests cruzados entre dominios (`/admin`, `/family`, `/nanny`), abortando la navegación antes de tocar la lógica del servidor.
+* **Chat Contextual**: Instanciación dinámica de salas de chat que requieren obligatoriamente una relación de base de datos `CONFIRMED` o `IN_CHAT` entre las partes, asegurando el encapsulamiento de la comunicación.
+* **Dockerización Total**: Orquestación en `docker-compose` de bases de datos y reverse proxies para eliminar discrepancias entre el entorno de desarrollo y producción.
 
 ---
 
-## 🛠️ Instalación y Configuración Local
+## 🛠️ Deploy & Setup Local
 
-1. **Clonar el repositorio**
-   ```bash
-   git clone https://github.com/nicvroyz/nannyconnect.git
-   cd nannyconnect
-   ```
-
-2. **Variables de Entorno**
-   ```bash
-   cp .env.example .env
-   ```
-   *Configura `DATABASE_URL` (Postgres), tu `NEXTAUTH_SECRET`, y claves API.*
-
-3. **Base de Datos (Prisma)**
-   ```bash
-   npm install
-   npx prisma generate
-   npx prisma db push
-   ```
-
-4. **Levantar el Servidor**
-   ```bash
-   npm run dev
-   ```
-
-## 📦 Deploy (Producción VPS)
-
-Despliegue configurado para `docker-compose`. Levanta la DB de PostgreSQL, la aplicación Next.js compilada y NGINX como reverse proxy.
-
+### Entorno de Producción (VPS)
+Configuración optimizada para Docker:
 ```bash
-# 1. Configurar .env con credenciales de producción
-# 2. Levantar los contenedores
+git clone https://github.com/nicvroyz/nannyconnect.git
+cd nannyconnect
+cp .env.example .env
+# Levantar infraestructura (App + DB + NGINX)
 docker-compose up -d --build
-
-# 3. Aplicar migraciones en contenedor productivo
+# Migraciones
 docker exec -it nannyconnect_app npx prisma migrate deploy
 ```
 
----
-> *Desarrollado para resolver la conectividad de cuidados infantiles bajo estrictos estándares de ingeniería de software.*
+### Entorno de Desarrollo
+```bash
+npm install
+npx prisma generate
+npx prisma db push
+npm run dev
+```
