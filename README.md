@@ -5,6 +5,12 @@
 
 ---
 
+## 📖 Contexto del Proyecto
+
+**Refugia** (internamente NannyConnect) es un SaaS B2C diseñado para resolver el problema de encontrar cuidado infantil de manera segura, rápida y trazable. La plataforma digitaliza el proceso completo de contratación: desde la búsqueda basada en geolocalización y validación de antecedentes, hasta la calendarización, el chat contextual y la pasarela de pago transaccional.
+
+---
+
 ## 🏗️ Arquitectura y Stack Tecnológico
 
 Refugia está construida sobre un stack moderno y escalable enfocado en el rendimiento y la seguridad del lado del servidor.
